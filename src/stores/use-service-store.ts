@@ -1,6 +1,6 @@
 import type { Query } from '@feathersjs/feathers'
 
-import { computed, unref } from 'vue-demi'
+import { computed, unref } from 'vue'
 import type { MaybeRef } from '@vueuse/core'
 import type { AnyData, CustomFilter } from '../types.js'
 import { useModelInstance } from '../modeling/use-model-instance'

@@ -1,7 +1,7 @@
 import type { MaybeRef } from '@vueuse/core'
-import type { Ref } from 'vue-demi'
+import type { Ref } from 'vue'
 import { _ } from '@feathersjs/commons'
-import { unref } from 'vue-demi'
+import { unref } from 'vue'
 import type { Params, Query } from '../types.js'
 import type { UseFindParams } from './types.js'
 

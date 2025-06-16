@@ -1,6 +1,6 @@
 import type { NullableId } from '@feathersjs/feathers'
-import type { Ref } from 'vue-demi'
-import { computed, del, ref, set } from 'vue-demi'
+import type { Ref } from 'vue'
+import { computed, ref } from 'vue'
 import type { RequestTypeById } from './types.js'
 
 function defaultPending() {
@@ -72,19 +72,21 @@ export function useServicePending() {
     else if (method === 'remove')
       place = removePendingById.value
 
-    if (val)
-      set(place, id, true)
-    else del(place, id)
+    if (place) {
+      if (val)
+        place[id] = true
+      else delete place[id]
+    }
   }
 
   function unsetPendingById(...ids: NullableId[]) {
     ids.forEach((id) => {
       if (id == null)
         return
-      del(createPendingById.value, id)
-      del(updatePendingById.value, id)
-      del(patchPendingById.value, id)
-      del(removePendingById.value, id)
+      delete createPendingById.value[id]
+      delete updatePendingById.value[id]
+      delete patchPendingById.value[id]
+      delete removePendingById.value[id]
     })
   }
 

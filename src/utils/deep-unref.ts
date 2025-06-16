@@ -1,5 +1,5 @@
 import type { MaybeRef } from '@vueuse/core'
-import { isRef, unref } from 'vue-demi'
+import { isRef, unref } from 'vue'
 
 const isObject = (val: Record<string, any>) => val !== null && typeof val === 'object'
 const isArray = Array.isArray

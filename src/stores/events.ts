@@ -1,5 +1,5 @@
 import type { FeathersService } from '@feathersjs/feathers'
-import { del, ref, set } from 'vue-demi'
+import { ref } from 'vue'
 import _debounce from 'just-debounce'
 import type { AnyData } from '../types.js'
 import { convertData, getId, hasOwn } from '../utils/index.js'
@@ -40,10 +40,10 @@ export function useServiceEvents<M extends AnyData>(options: UseServiceStoreEven
     if (!id)
       return
 
-    set(addOrUpdateById, id, item)
+    (addOrUpdateById.value as any)[id] = item
 
     if (hasOwn(removeItemsById.value, id))
-      del(removeItemsById, id)
+      delete (removeItemsById.value as any)[id]
 
     flushAddOrUpdateQueue()
   }
@@ -66,10 +66,10 @@ export function useServiceEvents<M extends AnyData>(options: UseServiceStoreEven
     if (!id)
       return
 
-    set(removeItemsById, id, item)
+    (removeItemsById.value as any)[id] = item
 
     if (hasOwn(addOrUpdateById.value, id))
-      del(addOrUpdateById.value, id)
+      delete (addOrUpdateById.value as any)[id]
 
     flushRemoveItemQueue()
   }

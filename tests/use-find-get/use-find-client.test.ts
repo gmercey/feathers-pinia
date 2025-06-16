@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import { computed, ref } from 'vue-demi'
+import { computed, ref } from 'vue'
 import { api, makeContactsData } from '../fixtures/index.js'
 import { resetService } from '../test-utils.js'
 

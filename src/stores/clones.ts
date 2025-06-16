@@ -1,4 +1,3 @@
-import { del as vueDelete } from 'vue-demi'
 import fastCopy from 'fast-copy'
 import type { AnyData, MakeCopyOptions } from '../types.js'
 import type { CloneOptions, beforeWriteFn, onReadFn } from './types.js'
@@ -108,7 +107,7 @@ export function useServiceClones<M extends AnyData>(options: UseServiceClonesOpt
       const copied = makeCopy(original, data, { isClone: true })
       Object.keys(original).forEach((key) => {
         if (original[key] == null)
-          vueDelete(copied, key)
+          delete copied[key]
       })
       cloneStorage.merge(copied)
     }

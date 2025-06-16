@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue-demi'
+import { computed, ref } from 'vue'
 import { api, makeContactsDataRandom } from '../fixtures/index.js'
 import { resetService } from '../test-utils.js'
 

@@ -23,7 +23,6 @@ export default defineConfig({
       // make sure to externalize deps that shouldn't be bundled
       // into your library
       external: [
-        'vue-demi',
         'vue',
         'pinia',
         '@feathersjs/commons',
@@ -36,7 +35,6 @@ export default defineConfig({
         // Provide global variables to use in the UMD build
         // for externalized deps
         globals: {
-          'vue-demi': 'VueDemi',
           'vue': 'Vue',
           'pinia': 'pinia',
           '@feathersjs/commons': 'commons',

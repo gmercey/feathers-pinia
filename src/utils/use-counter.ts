@@ -1,4 +1,4 @@
-import { ref } from 'vue-demi'
+import { ref } from 'vue'
 
 /**
  * Use a counter to track the number of pending queries. Prevents collisions with overlapping queries.

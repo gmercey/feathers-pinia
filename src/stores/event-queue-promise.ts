@@ -1,4 +1,4 @@
-import { watch } from 'vue-demi'
+import { watch } from 'vue'
 
 type EventName = 'created' | 'updated' | 'patched' | 'removed'
 

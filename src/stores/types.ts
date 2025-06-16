@@ -1,4 +1,4 @@
-import type { ComputedRef, Ref } from 'vue-demi'
+import type { ComputedRef, Ref } from 'vue'
 import type { Id, Query } from '@feathersjs/feathers'
 import type { MaybeRef } from '@vueuse/core'
 import type { AnyData, Paginated, Params, QueryInfo } from '../types.js'

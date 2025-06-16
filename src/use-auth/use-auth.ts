@@ -1,6 +1,6 @@
-import type { Ref } from 'vue-demi'
+import type { Ref } from 'vue'
 import type { NullableId } from '@feathersjs/feathers'
-import { computed, ref } from 'vue-demi'
+import { computed, ref } from 'vue'
 import { jwtDecode } from 'jwt-decode'
 import { useCounter } from '../utils/use-counter'
 

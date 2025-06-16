@@ -1,4 +1,4 @@
-import { computed, watch } from 'vue-demi'
+import { computed, watch } from 'vue'
 import { _ } from '@feathersjs/commons'
 import debounce from 'just-debounce'
 

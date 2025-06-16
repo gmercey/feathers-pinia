@@ -1,5 +1,5 @@
-import type { ComputedRef, Ref, UnwrapNestedRefs, WritableComputedRef } from 'vue-demi'
-import { computed, reactive, ref, unref, watch } from 'vue-demi'
+import type { ComputedRef, Ref, UnwrapNestedRefs, WritableComputedRef } from 'vue'
+import { computed, reactive, ref, unref, watch } from 'vue'
 import { _ } from '@feathersjs/commons'
 import { useDebounceFn } from '@vueuse/core'
 import stringify from 'fast-json-stable-stringify'

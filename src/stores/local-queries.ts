@@ -1,7 +1,7 @@
 import type { MaybeRef } from '@vueuse/core'
 import type { Id } from '@feathersjs/feathers'
 import { _ } from '@feathersjs/commons'
-import { computed, reactive, unref } from 'vue-demi'
+import { computed, reactive, unref } from 'vue'
 import { select, sorter } from '@feathersjs/adapter-commons'
 import sift from 'sift'
 import fastCopy from 'fast-copy'

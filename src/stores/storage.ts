@@ -1,5 +1,5 @@
 import type { Id } from '@feathersjs/feathers'
-import { type Ref, computed, ref, del as vueDel, set as vueSet } from 'vue-demi'
+import { type Ref, computed, ref } from 'vue'
 import type { AnyData, ById } from '../types.js'
 import type { AssignFn, beforeWriteFn, onReadFn } from './types.js'
 
@@ -64,7 +64,7 @@ export function useServiceStorage<M extends AnyData>({
   const setItem = (id: Id, item: M) => {
     if (id == null)
       throw new Error('item has no id')
-    vueSet(byId.value, id, beforeWrite(item))
+    byId.value[id] = beforeWrite(item) as M
     return getItem(id)
   }
 
@@ -112,7 +112,7 @@ export function useServiceStorage<M extends AnyData>({
   const removeItem = (id: Id) => {
     const hadItem = hasItem(id)
     if (hadItem)
-      vueDel(byId.value, id)
+      delete byId.value[id]
 
     return hadItem
   }
@@ -136,7 +136,7 @@ export function useServiceStorage<M extends AnyData>({
    */
   const clear = () => {
     Object.keys(byId.value).forEach((id) => {
-      vueDel(byId.value, id)
+      delete byId.value[id]
     })
   }
 

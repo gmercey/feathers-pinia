@@ -1,5 +1,5 @@
 import { createPinia, defineStore } from 'pinia'
-import { computed, ref } from 'vue-demi'
+import { computed, ref } from 'vue'
 import { useDataStore } from '../../src'
 
 const pinia = createPinia()

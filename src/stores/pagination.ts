@@ -1,10 +1,10 @@
-import type { ComputedRef, Ref } from 'vue-demi'
-import { ref, set } from 'vue-demi'
+import type { ComputedRef, Ref } from 'vue'
+import { ref } from 'vue'
 import stringify from 'fast-json-stable-stringify'
 import { _ } from '@feathersjs/commons/lib'
 import { deepUnref, getId, hasOwn } from '../utils/index.js'
 import type { Params, Query, QueryInfo } from '../types.js'
-import type { PaginationState, UpdatePaginationForQueryOptions } from './types.js'
+import type { PaginationState, UpdatePaginationForQueryOptions, MostRecentQuery } from './types.js'
 
 export interface UseServicePagination {
   idField: string
@@ -39,13 +39,13 @@ export function useServicePagination(options: UseServicePagination) {
     const { queryId, queryParams, pageId, pageParams } = getQueryInfo({ qid, query })
 
     if (!pagination.value[qid])
-      set(pagination.value, qid, {})
+      pagination.value[qid] = {} as any
 
     if (!hasOwn(query, '$limit') && hasOwn(response, 'limit'))
-      set(pagination.value, 'defaultLimit', response.limit)
+      pagination.value['defaultLimit'] = response.limit
 
     if (!hasOwn(query, '$skip') && hasOwn(response, 'skip'))
-      set(pagination.value, 'defaultSkip', response.skip)
+      pagination.value['defaultSkip'] = response.skip
 
     const mostRecent = {
       query,
@@ -62,13 +62,13 @@ export function useServicePagination(options: UseServicePagination) {
     const qidData = pagination.value[qid] || {}
     Object.assign(qidData, { mostRecent })
 
-    set(qidData, queryId, qidData[queryId] || {})
+    qidData[queryId] = qidData[queryId] || {}
     const queryData = {
       total,
       queryParams,
     }
 
-    set(qidData, queryId, Object.assign({}, qidData[queryId], queryData))
+    qidData[queryId] = Object.assign({}, qidData[queryId], queryData)
 
     const ssr = preserveSsr ? existingPageData?.ssr : isSsr.value
 
@@ -80,7 +80,7 @@ export function useServicePagination(options: UseServicePagination) {
 
     const newState = Object.assign({}, pagination.value[qid], qidData)
 
-    set(pagination.value, qid, newState)
+    pagination.value[qid] = newState
   }
 
   function unflagSsr(params: Params<Query>) {

@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue-demi'
+import { computed, ref } from 'vue'
 import { api, makeContactsData } from '../fixtures/index.js'
 import { resetService, timeout } from '../test-utils.js'
 

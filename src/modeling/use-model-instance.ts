@@ -1,5 +1,5 @@
 import ObjectID from 'isomorphic-mongo-objectid'
-import type { Ref } from 'vue-demi'
+import type { Ref } from 'vue'
 import type { CloneOptions } from '../stores/index.js'
 import type { AnyData, ById, Params } from '../types.js'
 import { defineValues } from '../utils/define-properties'

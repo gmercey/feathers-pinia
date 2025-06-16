@@ -1,4 +1,4 @@
-import { ref } from 'vue-demi'
+import { ref } from 'vue'
 import { usePageData } from '../../src/use-find-get/utils-pagination'
 
 describe('usePageData', () => {

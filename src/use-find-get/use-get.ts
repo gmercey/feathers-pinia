@@ -1,6 +1,6 @@
 import type { Id } from '@feathersjs/feathers'
 import type { MaybeRef } from '@vueuse/core'
-import { computed, isRef, reactive, ref, unref, watch } from 'vue-demi'
+import { computed, isRef, reactive, ref, unref, watch } from 'vue'
 import type { AnyData, MaybeRefOrComputed } from '../types.js'
 import type { UseFindGetDeps, UseGetParams } from './types.js'
 
