@@ -28,14 +28,16 @@ createPiniaClient(feathersClient, {
   syncWithStorage: true || ['itemsById', 'pagination', 'etc'],
   whitelist: ['$customLocalParam'],
   paramsForServer: ['$customServerParam'],
-  skipGetIfExists: true,
+  skipGetIfExists: false, // runtime default is `false`
   handleEvents: {}, // HandleEvents<AnyData>
   debounceEventsTime: 20,
   debounceEventsGuarantee: false,
   customSiftOperators: {}, // see sift docs
-  customFilters: {}, // see custom query filters
+  // customFilters is an ARRAY of CustomFilter definitions (merged global + service-level)
+  customFilters: [], // see custom query filters
   // runs for every service
-  setupInstance: (data = {}, { api, service, servicePath }) => {
+  // NOTE: the runtime provides { app, service, servicePath }
+  setupInstance: (data = {}, { app, service, servicePath }) => {
     if (servicePath.startsWith('my-')) {
       Object.defineProperty(data, 'belongsToMe', {
         get() {
@@ -58,7 +60,7 @@ createPiniaClient(feathersClient, {
     contacts: {
       whitelist: ['$test'],
       // runs after the global setupInstance
-      setupInstance(data: any, { api, service, servicePath }) {
+      setupInstance(data: any, { app, service, servicePath }) {
         const withDefaults = useInstanceDefaults({ name: '', age: 0 }, data)
         return withDefaults
       },
@@ -93,26 +95,38 @@ The pseudo-interface, below, shows possible configuration values with their defa
 are required and have no default value.
 
 ```ts
+// Types only; runtime defaults are listed below
 interface CreatePiniaClientConfig {
   idField: string
   pinia: Pinia
-  ssr?: false
-  storage?: undefined
+  ssr?: boolean
+  storage?: Storage
   services?: Record<string, PiniaServiceConfig>
   // global and per-service options
-  defaultLimit?: 10
-  syncWithStorage?: undefined
+  defaultLimit?: number
+  syncWithStorage?: boolean | string[]
   whitelist?: string[]
   paramsForServer?: string[]
-  skipGetIfExists?: true
+  skipGetIfExists?: boolean
   handleEvents?: HandleEvents<AnyData>
-  debounceEventsTime?: 20
-  debounceEventsGuarantee?: false
+  debounceEventsTime?: number
+  debounceEventsGuarantee?: boolean
   customSiftOperators?: Record<string, SiftOperator>
-  setupInstance?: (data = {}, { api, service, servicePath }) => (modifiedData)
-  customizeStore?: (defaultStore) => modifiedStore
+  // NOTE: customFilters is an ARRAY of CustomFilter definitions (merged global + service-level)
+  customFilters?: CustomFilter[]
+  setupInstance?: (data: any, utils: SetupInstanceUtils) => any
+  customizeStore?: (defaultStore: any) => any
 }
 ```
+
+Defaults (runtime):
+
+- `defaultLimit`: 10
+- `skipGetIfExists`: false
+- `debounceEventsTime`: 20
+- `debounceEventsGuarantee`: false
+- `syncWithStorage`: false (or empty array)
+
 
 Let's take a closer look at each one:
 
@@ -135,8 +149,9 @@ This helps ensure consistent pagination behavior and can be overridden per-servi
 - **`skipGetIfExists {Boolean}`** when enabled will cause a `.get` request to automatically resolve with the stored
 record, if one exists. If not, the request will be made as normal.
 - **`handleEvents {Object}`** is an object that lets you customize how realtime events are handled. Each key is a name
-- of a realtime event handler function: `created`, `patched`, `updated`, or `removed`. You can provide your own handler
-- to customize and override individual events. The handler's function signature is
+  of a realtime event handler function. By default Feathers-Pinia wires `created`, `patched` and `removed` events; you
+  may also provide handlers for `updated` if your backend emits it. Provide your own handler to customize or override
+  individual events. The handler's function signature is
 
   ```ts
   function eventHandler(data, { service }) {
@@ -157,15 +172,15 @@ default.
 - **`customSiftOperators {Object}`** allows passing an object of custom [sift operators](https://github.com/crcn/sift.js/)
 which are used to query data from the store with `findInStore` and `useFind`. All sift operators are enabled for store
 queries.
-- **`customFilters {Object}`** allows passing an object of custom query filters. See [Custom Query Filters](/guide/custom-query-filters)
+- **`customFilters {Array}`** allows passing an array of custom query filters. These are merged (global + service-level) and used by `findInStore`/`useFind`. See [Custom Query Filters](/guide/custom-query-filters)
 - **`setupInstance {Function}`** a global model function that allows modifying instances from all services. It has the
 following shape:
 
   ```ts
-  // modify data and return the modified object
-  function setupInstance(data, { app, service, servicePath }) {
-    return data
-  }
+    // modify data and return the modified object
+    function setupInstance(data, { app, service, servicePath }) {
+      return data
+    }
   ```
 
 - **`customizeStore {Function}`** a function that allows modifying the store for all services. Return the modified store
@@ -203,14 +218,15 @@ interface PiniaServiceConfig {
 }
 
 interface SetupInstanceUtils {
-  app?: any
-  service?: any
-  servicePath?: string
+  // runtime always provides these values
+  app: any
+  service: any
+  servicePath: string
 }
 ```
 
-The `storeName` and `instanceServicePath` options were introduced in Feathers-Pinia 4.2. They are not configurable at 
-the global level.
+The `storeName` and `instanceServicePath` options were introduced in Feathers-Pinia 4.2. They are per-service options and
+must be provided under `services.{path}` (they are ignored if placed at the global top-level `CreatePiniaClientConfig`).
 
 - **`storeName {String}`** is the name of the store to use for this service. Defaults to `service:${servicePath}`. You can
 also use `storeName` to make two services share the same store.
@@ -218,19 +234,17 @@ also use `storeName` to make two services share the same store.
 `remove`. Useful for "proxy" services. For example: `pages/full` loads the page record with populated data, but you
 want to patch/remove the record through the `pages` service.
 
-These options are all configurable at the global and service levels. See descriptions in the global configuration
-section. Here is a description of how each option is handled when it's also configured globally:
+Option merge behavior when a value is set at both global and service level:
 
-- **`idField`** overrides the global value
-- **`defaultLimit`** overrides the global value
-- **`whitelist`** concatenated with the global value
-- **`paramsForServer`** concatenated with the global value
-- **`skipGetIfExists {Boolean}`** overrides the global value
-- **`handleEvents {Object}`** overrides the global value
-- **`debounceEventsTime {Number}`** overrides the global value
-- **`debounceEventsGuarantee {Boolean}`** overrides the global value
-- **`customSiftOperators {Object}`** merged over the global value
-- **`setupInstance {Function}`** runs after the global value. The global `setupInstance` will already have been applied
-by the time the service-level `setupInstance` runs.
-- **`customizeStore {Function}`** runs after the global `customizeStore` and receives the store data with globally-
-customized values.
+- **`idField`** service-level overrides the global value
+- **`defaultLimit`** service-level overrides the global value
+- **`whitelist`** concatenates service-level values after global values
+- **`paramsForServer`** concatenates service-level values after global values
+- **`skipGetIfExists`** service-level overrides the global value
+- **`handleEvents`** service-level overrides the global value
+- **`debounceEventsTime`** service-level overrides the global value
+- **`debounceEventsGuarantee`** service-level overrides the global value
+- **`customSiftOperators`** service-level values are merged over the global value
+- **`setupInstance`** service-level `setupInstance` runs after the global `setupInstance`
+- **`customizeStore`** service-level `customizeStore` runs after the global `customizeStore` and receives the
+  store data with globally-customized values.
